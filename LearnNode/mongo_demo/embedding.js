@@ -14,31 +14,20 @@ const Author = mongoose.model('Author', authorSchema);
 
 const Course = mongoose.model('Course', new mongoose.Schema({
     name: String,
+    /*
     author: {
         type: authorSchema,
         required: true
     }
+    */
+    authors: [authorSchema]
 }));
 
-async function createAuthor(name, bio, website){
-    const author = new Author({
-        name,
-        bio,
-        website
-    });
-    
-    try{
-        const result = await author.save();
-        console.log(result);
-    }catch(ex){
-        console.log(ex.message);
-    }
-}
 
-async function createCourse(name, author){
+async function createCourse(name, authors){
     const course = new Course({
         name,
-        author
+        authors
     });
     
     try{
@@ -58,6 +47,22 @@ async function listCourses(){
 
     console.log(courses);
 }
+
+async function createAuthor(name, bio, website){
+    const author = new Author({
+        name,
+        bio,
+        website
+    });
+    
+    try{
+        const result = await author.save();
+        console.log(result);
+    }catch(ex){
+        console.log(ex.message);
+    }
+}
+
 /*
 async function updateAuthor(courseId){
     const course = await Course.findById(courseId);
@@ -74,7 +79,34 @@ async function updateAuthor(courseId){
     });
 }
 
-updateAuthor('5f7e817c85f2501361742331');
+async function addAuthor(courseId, author){
+    const course = await Course.findById(courseId);
+    course.authors.push(author);
+    course.save();
+}
+
+async function removeAuthor(courseId, authorId){
+    const course = await Course.findById(courseId);
+    const author = course.authors.id(authorId);
+    author.remove();
+    course.save();
+}
+
+
+
+removeAuthor('5f841fa33d5c380f0abd39cc', '5f841fa33d5c380f0abd39cb');
+
+//addAuthor('5f841fa33d5c380f0abd39cc', new Author({ name: 'Ricky B'}));
+
+//updateAuthor('5f7e817c85f2501361742331');
+
 //createAuthor('Mukesh K', 'My bio', 'My Website');
-// createCourse('Angular', new Author({name: 'Mukesh K'}));
+
+/*
+createCourse('Node Course', [
+    new Author({name: 'Mukesh K'}),
+    new Author({name: 'Sandra B'})
+]);
+*/
+
 //listCourses();
