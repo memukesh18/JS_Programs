@@ -1,20 +1,18 @@
-
-const genres = require('./routes/genres');
-const home = require('./routes/home');
-const express = require('express');
+const winston = require("winston");
+const express = require("express");
+const config = require("config");
 const app = express();
 
-app.set('view engine', 'pug');
-app.set('views', './views');  //default
+require("./startup/logging")();
+require("./startup/cors")(app);
+require("./startup/routes")(app);
+require("./startup/db")();
+require("./startup/config")();
+require("./startup/validation")();
 
-app.use(express.json());
-app.use('/api/genres', genres);
-app.use('/', home);
+const port = process.env.PORT || config.get("port");
+const server = app.listen(port, () =>
+  winston.info(`Listening on port ${port}...`)
+);
 
-
-const port = process.env.PORT  || 3000;
-app.listen(port, () => console.log(`Listening on port ${port}...`));
-
-
-
-
+module.exports = server;
